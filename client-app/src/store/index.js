@@ -9,9 +9,11 @@ import thunk from "redux-thunk";
 import logger from "redux-logger";
 
 import savedNewsReducer from "./savedNews";
+import userReducer from "./user";
 
 const rootReducer = combineReducers({
   savedNews: savedNewsReducer,
+  user: userReducer,
 });
 
 let enhancer = applyMiddleware(thunk);
