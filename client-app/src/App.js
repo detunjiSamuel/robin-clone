@@ -1,8 +1,9 @@
 import logo from "./logo.svg";
 import "./App.css";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import LoginForm from "./components/auth/loginForm";
 
-
-function App() {
+function Base() {
   return (
     <div className="App">
       <header className="App-header">
@@ -20,6 +21,17 @@ function App() {
         </a>
       </header>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route exact path="/" element={<Base />} />
+        <Route exact path="/login" element={<LoginForm />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
