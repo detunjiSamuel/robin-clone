@@ -32,7 +32,34 @@ const LoginForm = () => {
     return <Navigate to="/" replace={true} />;
   }
 
-  return <div>LOGIN PAGE</div>;
+  return (
+    <div>
+      LOGIN PAGE
+      <form onSubmit={onLogin}>
+        <div>
+          <label htmlFor="email">Email</label>
+          <input
+            name="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="password">Password</label>
+          <input
+            name="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        {errors && <div>{errors}</div>}
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  );
 };
 
 export default LoginForm;

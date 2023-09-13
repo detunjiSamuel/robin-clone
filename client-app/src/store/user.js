@@ -25,23 +25,28 @@ const storeDispatchs = {
 // login
 
 export const login = (email, password) => async (dispatch) => {
-  const response = await fetch(`${API_BASE_AUTH}/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password }),
-  });
+  try {
+    const response = await fetch(`${API_BASE_AUTH}/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-  if (response.ok) {
-    const user = await response.json();
-    dispatch(storeDispatchs.setUser(user));
-  } else if (response.status < 500) {
-    const data = await response.json();
-    if (data.error) {
-      return data.error;
+    if (response.ok) {
+      const user = await response.json();
+      dispatch(storeDispatchs.setUser(user));
+    } else if (response.status < 500) {
+      const data = await response.json();
+      if (data.error) {
+        return data.error;
+      }
+    } else {
+      return "internal server error";
     }
-  } else {
+  } catch (e) {
+    console.log(e);
     return "internal server error";
   }
 };
