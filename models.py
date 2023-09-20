@@ -5,32 +5,6 @@ from flask_sqlalchemy import SQLAlchemy
 from app import db
 
 
-class Asset(db.Model):
-    __tablename__ = "assets"
-
-    __table_args__ = (
-        db.UniqueConstraint("user_id", "symbol"),
-    )
-
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer,
-                        db.ForeignKey("users.id"),
-                        nullable=False)
-    symbol = db.Column(db.String, nullable=False)
-    name = db.Column(db.String, nullable=False)
-    quantity = db.Column(db.Float, nullable=False)
-    avg_price = db.Column(db.Float, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user = db.relationship("User", back_populates="assets")
-
-    def json(self):
-        return {
-            "symbol": self.symbol,
-            "name": self.name,
-            "quantity": self.quantity,
-            "avgPrice": self.avg_price
-        }
 
 class StockSymbol(db.Model):
     __tablename__ = 'stock_symbols'
@@ -110,19 +84,4 @@ class News(db.Model):
             "article_link": self.article_link,
         }
     
-class Transaction(db.Model):
-    __tablename__ = 'transactions'
 
-
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    symbol = db.Column(db.String(10), nullable=False)
-    # sell or buy
-    transaction_type = db.Column(db.String(20), nullable=False)
-    price = db.Column(db.Float, nullable=False)
-    quantity = db.Column(db.Float, nullable=False)
-    transaction_time = db.Column(db.DateTime, default=datetime.utcnow)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    user = db.relationship("User", back_populates='transactions')
