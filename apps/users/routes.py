@@ -25,8 +25,8 @@ def authenticate():
 
     if current_user.is_authenticated:
         user = User.query.get(current_user.id)
-        response = user.to_dict()
-        response["assets"] = {asset.symbol: asset.to_dict()
+        response = user.json()
+        response["assets"] = {asset.symbol: asset.json()
                               for asset in user.assets}
 
         totalStock = sum(
@@ -47,8 +47,8 @@ def login():
         user = User.query.filter(User.email == form.data['email']).first()
         login_user(user)
 
-        response = user.to_dict()
-        response["assets"] = {asset.symbol: asset.to_dict()
+        response = user.json()
+        response["assets"] = {asset.symbol: asset.json()
                               for asset in user.assets}
 
         totalStock = sum(
@@ -84,8 +84,8 @@ def sign_up():
         db.session.commit()
         login_user(user)
 
-        response = user.to_dict()
-        response["assets"] = {asset.symbol: asset.to_dict()
+        response = user.json()
+        response["assets"] = {asset.symbol: asset.json()
                               for asset in user.assets}
 
         totalStock = sum(

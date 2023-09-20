@@ -78,7 +78,7 @@ class WatchList(db.Model):
             'id': self.id,
             'name': self.name,
             'user_id': self.user_id,
-            'watchlist_stocks': [stock.to_dict() for stock in self.watchlist_stocks]
+            'watchlist_stocks': [stock.json() for stock in self.watchlist_stocks]
         }
 
 class News(db.Model):
