@@ -4,6 +4,8 @@ import { Link, Navigate } from "react-router-dom";
 
 import { login } from "../../store/user";
 
+import leftImage from "../../images/login-image.jpeg";
+
 const LoginForm = () => {
   const [errors, setErrors] = useState("");
   const [email, setEmail] = useState("");
@@ -22,6 +24,19 @@ const LoginForm = () => {
     }
 
     const returnedError = await dispatch(login(email, password));
+
+    if (returnedError) {
+      setErrors(returnedError);
+    }
+  };
+
+  const fakeLogin = async (e) => {
+    e.preventDefault();
+
+    const testEmail = "test123@test.com";
+    const testPass = "testing1234";
+
+    const returnedError = await dispatch(login(testEmail, testPass));
 
     if (returnedError) {
       setErrors(returnedError);
