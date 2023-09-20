@@ -4,13 +4,14 @@ from flask_login import login_required, current_user
 import requests
 import os
 
-from .models import StockSymbol , WatchList , WatchList_Stock
-from .forms import WatchListForm , AddStockForm
+from .models import StockSymbol , WatchList , WatchList_Stock , News
+from .forms import WatchListForm , AddStockForm , AddArticleForm
 
 from db import db
 
 stock_routes = Blueprint('stock', __name__)
 watchlist_routes =  Blueprint('watchlists', __name__)
+news_routes = Blueprint('news', __name__)
 
 @stock_routes.route('/search/<string:keyword>')
 def search_symbols(keyword):
@@ -220,8 +221,87 @@ def delete_stock(stock_id):
 def user_watchlists():
     current_user_info = current_user.json()
     current_user_id = current_user_info['id']
-    """
-    Query for all user_watchlists and returns them in a list of user_watchlist dictionaries
-    """
     user_watchlists = WatchList.query.filter(WatchList.user_id == current_user_id ).all()
     return {'watchlists': [watchlist.json() for watchlist in user_watchlists]}
+
+
+@news_routes.route("/")
+def get_all_news():
+    key_choice = os.getenv("STOCK_API_KEYS")
+    url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&apikey={key_choice}&sort=LATEST'
+    r = requests.get(url)
+    data = r.json()
+    if "feed" in data:
+        feed = data["feed"]
+        article_data = [{"source": article["source"], "title": article["title"],
+                        "image": article["banner_image"], "url": article["url"],
+                         "tickers": [stock["ticker"] for stock in article["ticker_sentiment"]]} for article in feed if "banner_image" in article and article["banner_image"]]
+
+        return jsonify(article_data[:25])
+    else:
+        return jsonify({"error": "No news found at the moment"}), 500
+ 
+
+@news_routes.route("/<string:ticker>")
+def get_news_by_ticker(ticker):
+    # return a an enumarated list of keys
+    news_api_keys = os.getenv("STOCK_API_KEYS")
+
+    url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&apikey={news_api_keys}&tickers={ticker}&sort=LATEST'
+    r = requests.get(url)
+    data = r.json()
+
+    if "feed" in data:
+        feed = data["feed"]
+        article_data = [{"source": article["source"], "title": article["title"],
+                         "image": article["banner_image"], "url": article["url"],
+                         "tickers": [stock["ticker"] for stock in article["ticker_sentiment"]]} for article in feed if "banner_image" in article and article["banner_image"]]
+        return jsonify(article_data[:5])
+    else:
+        return jsonify({"error": "No news found at the moment"}), 500
+
+
+@news_routes.route("/liked", methods=["GET"])
+@login_required
+def get_article_like():
+    liked = News.query.filter(News.like == '1').filter(
+        News.user_id == current_user.id).all()
+    return jsonify([news.to_dict() for news in liked]), 200
+
+
+@news_routes.route("/liked", methods=["POST"])
+def add_article_like():
+    add_article_form = AddArticleForm()
+    add_article_form['csrf_token'].data = request.cookies['csrf_token']
+    # sending to the database
+
+    if add_article_form.validate_on_submit():
+        new_liked_article = News(
+            like=True,
+            user_id=add_article_form.data['user_id'],
+            title=add_article_form.data['title'],
+            source=add_article_form.data['source'],
+            image=add_article_form.data['image'],
+            article_link=add_article_form.data['article_link']
+        )
+        db.session.add(new_liked_article)
+        db.session.commit()
+        return jsonify(new_liked_article.to_dict())
+    else:
+        return jsonify(add_article_form.errors), 406
+
+
+@login_required
+@news_routes.route("/liked/<int:news_id>", methods=["DELETE"])
+def delete_article_like(news_id):
+    # find the liked article where user id is the same as the user_id
+    # delete
+    article = News.query.get(news_id)
+    if current_user.id != article.user_id:
+        return {
+            "message": "This like does not belong to you"
+        }
+
+    db.session.delete(article)
+    db.session.commit()
+    return {"message": "Deleted like"}
