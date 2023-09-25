@@ -59,6 +59,6 @@ def inject_csrf_token(response):
 
 @app.route("/")
 def hello_world():
-    return "<p>Hello, World!</p>"
+    return "<p>CURRENTLY DOWN</p>"
 
 
