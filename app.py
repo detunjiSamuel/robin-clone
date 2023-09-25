@@ -6,7 +6,7 @@ from flask_login import LoginManager
 
 from os import environ
 from db import db
-from config import Config
+
 
 from apps.users.routes import user_routes , auth_routes
 from apps.stocks.routes import stock_routes , watchlist_routes , news_routes
