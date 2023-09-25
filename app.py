@@ -6,6 +6,7 @@ from flask_login import LoginManager
 
 from os import environ
 from db import db
+from config import Config
 
 from apps.users.routes import user_routes , auth_routes
 from apps.stocks.routes import stock_routes , watchlist_routes , news_routes
@@ -25,6 +26,8 @@ def load_user(id):
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URL')
+
+app.config['SECRET_KEY'] = environ.get('SECRET_KEY' , "test-secret")
 
 # db = SQLAlchemy(app)
 
