@@ -20,6 +20,13 @@ auth_routes = Blueprint('auth', __name__)
 user_routes = Blueprint('users', __name__)
 
 
+
+"""
+
+AUTH ROUTES BEGIN HERE /api/auth
+
+"""
+
 @auth_routes.route('/')
 def authenticate():
 
@@ -100,9 +107,53 @@ def unauthorized():
     return {'errors': ['Unauthorized']}, 401
 
 
+
+"""
+
+USER ROUTES BEGIN HERE /api/user
+
+"""
+
+@user_routes.route('/')
+@login_required
+def users():
+    """
+    GET ALL USERS
+    """
+    users = User.query.all()
+    return {'users': [user.json() for user in users]}
+
+@user_routes.route("/<email>")
+def findEmail(email):
+    """
+    VERIFY USER EXISTS BY EMAIL
+    """
+
+    user = bool(User.query.filter(User.email.ilike(email)).all())
+    if user:
+        return jsonify(user), 409
+    else:
+        return jsonify(user), 200
+
+@user_routes.route('/<int:id>')
+@login_required
+def user(id):
+    """
+    GET USER BY ID
+    """
+
+    user = User.query.get(id)
+    return user.json()
+
+
+
 @login_required
 @user_routes.route('/upload', methods=['POST'])
 def file_upload():
+    """
+    UPLOAD PROFILE PICTURE TO AWS S3
+    
+    """
     try:
         file = request.files['file']
         file_url = current_user.upload_profile(file)
@@ -114,9 +165,13 @@ def file_upload():
         return {'error': 'Something went wrong'}, 500
 
 
-@login_required
+
 @user_routes.route('/upload', methods=['DELETE'])
+@login_required
 def remove_profile():
+    """
+    DELETE PROFILE PICTURE FROM AWS S3
+    """
     try:
         current_user.delete_profile()
         return {'message': 'Successfully removed'}
@@ -125,39 +180,22 @@ def remove_profile():
         return {'error': 'Something went wrong'}, 500
 
 
-@user_routes.route('/')
-@login_required
-def users():
-
-    users = User.query.all()
-    return {'users': [user.json() for user in users]}
-
-
-@user_routes.route('/<int:id>')
-@login_required
-def user(id):
-
-    user = User.query.get(id)
-    return user.json()
-
-
-@user_routes.route("/<email>")
-def findEmail(email):
-
-    user = bool(User.query.filter(User.email.ilike(email)).all())
-    if user:
-        return jsonify(user), 409
-    else:
-        return jsonify(user), 200
-
 
 @user_routes.route("/transaction", methods=["PUT"])
+@login_required
 def update_networth():
+    """
+    
+    INITIATE TRANSACTION AND UPDATE USER NETWORTH
+    
+    """
     data = request.get_json()
+
     data["csrf_token"] = request.cookies['csrf_token']
     transactionForm = TransactionForm(**data)
     total_cost = data["price"] * data["quantity"]
 
+    # MIN AMOUNT CHECK -> CANNOT SELL LESS THAN REQUIRED
     if not data["quantity"] > 0:
         return jsonify({"errors": {"amount": "Amount cannot be 0 "}}), 400
 
@@ -165,26 +203,32 @@ def update_networth():
         user = User.query.get(current_user.id)
         data["user_id"] = user.id
         transactionData = {**data}
-        del transactionData["name"]
         del transactionData["csrf_token"]
+        del transactionData["name"]       
+        # CHECK IF USER HAS ENOUGH FUNDS TO BUY
         if total_cost > user.networth and data["transaction_type"] == "buy":
             return jsonify({"errors": {"amount": "not enough funds."}}), 400
 
+        # GET A USER's STOCK INFORMATION FOR A SUNGLE ASSET i.e how many shares of a stock(AAPLE) they own
         stock = Asset.query.filter(Asset.user_id == user.id).filter(
             Asset.symbol.ilike(data["symbol"])).one_or_none()
 
+
         if not stock and data["transaction_type"] == "buy":
+            """
+            HANDLES FIRST TIME BUYING THAT ASSET
+												"""
             data["avg_price"] = data["price"]
             assetForm = AssetForm(**data)
 
             if assetForm.validate_on_submit():
+                transction = Transaction(**transactionData)
+                
                 del data['csrf_token']
                 del data["transaction_type"]
                 del data["price"]
-                transction = Transaction(**transactionData)
                 stock = Asset(**data)
-                stock.quantity = data["quantity"]
-                stock.avg_price = data["avg_price"]
+                
                 user.networth = user.networth - total_cost
                 db.session.add_all([transction, stock])
                 db.session.commit()
@@ -199,6 +243,9 @@ def update_networth():
                 return jsonify(response), 201
 
         if data["quantity"] > stock.quantity and data["transaction_type"] == "sell":
+            """
+            CANNOT SELL WHAT YOU DONT HAVE
+												"""
             return jsonify({"errors": {"amount": "not enough stock"}}), 400
 
         if stock and data["transaction_type"] == "buy":

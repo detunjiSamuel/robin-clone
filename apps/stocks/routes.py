@@ -13,33 +13,44 @@ stock_routes = Blueprint('stock', __name__)
 watchlist_routes =  Blueprint('watchlists', __name__)
 news_routes = Blueprint('news', __name__)
 
-@stock_routes.route('/search/<string:keyword>')
-def search_symbols(keyword):
-    result = [{'symbol': item.stock_symbol, 'name': item.company} for item in StockSymbol.query.filter(StockSymbol.stock_symbol.ilike(f'%{keyword}%') | StockSymbol.company.ilike(
-        f'%{keyword}%')).order_by(case((StockSymbol.stock_symbol.startswith(keyword), 0), (StockSymbol.company.startswith(keyword), 1), else_=2)).limit(7)]
 
-    return jsonify(result)
+"""
+STOCK ROUTES BEGIN HERE /api/stock
 
+USE :  ENDPOINTS ALL FOR GETTING INFORMATION ABOUT STOCKS
+
+"""
+
+@stock_routes.route('/get-key')
+def get_key():
+    apikey = os.environ.get('STOCK_API_KEY')
+    return {'api_key': apikey}
 
 @stock_routes.route('/get-data/<string:symbol>')
 def get_data(symbol):
     func = request.args.get('func') or 'daily'
-    apikey = os.environ.get('STOCK_API_KEYS')
+    apikey = os.environ.get('STOCK_API_KEY')
     url = f'https://www.alphavantage.co/query?function={"TIME_SERIES_DAILY_ADJUSTED" if func == "daily" else "TIME_SERIES_INTRADAY"}&symbol={symbol}&apikey={apikey}&outputsize=full{"&interval=5min" if func == "minutely" else ""}'
 
     res = requests.get(url).json()
     return res
 
 
-@stock_routes.route('/get-key')
-def get_key():
-    apikey = os.environ.get('STOCK_API_KEYS')
-    return {'apikey': apikey}
+@stock_routes.route('/search/<string:keyword>')
+def search_symbols(keyword):
+    result = [
+        {'symbol': item.stock_symbol, 'name': item.company} 
+        for item in StockSymbol.query.filter(StockSymbol.stock_symbol.ilike(f'%{keyword}%') 
+                                             | 
+                                             StockSymbol.company.ilike(
+        f'%{keyword}%')).order_by(case((StockSymbol.stock_symbol.startswith(keyword), 0), (StockSymbol.company.startswith(keyword), 1), else_=2)).limit(7)]
+
+    return jsonify(result)
 
 
 @stock_routes.route("/company-information/<string:ticker>")
 def company_information(ticker):
-    apikey = os.environ.get('STOCK_API_KEYS')
+    apikey = os.environ.get('STOCK_API_KEY')
     url = f"https://www.alphavantage.co/query?function=OVERVIEW&symbol={ticker}&apikey={apikey}"
     data = requests.get(url).json()
 
@@ -68,18 +79,11 @@ def company_information(ticker):
     else:
         return jsonify({"errors": "Data not available at the moment"}), 417
 
+"""
+WATCHLIST ROUTES BEGIN HERE /api/watchlists
 
+"""
 
-@watchlist_routes.route('/')
-@login_required
-def all_watchlists():
-    """
-    Query for all watchlists and returns them in a list of watchlist dictionaries
-    """
-    watchlists = WatchList.query.all()
-    return {'watchlists': [watchlist.json() for watchlist in watchlists]}
-
-#create watchlist
 
 @watchlist_routes.route('/', methods=['POST'])
 @login_required
@@ -102,7 +106,7 @@ def create_watchlist():
     if form.errors:
         return {'error': form.errors}
 
-#update watchlist
+
 @watchlist_routes.route('/<int:watchlist_id>', methods=['PUT'])
 @login_required
 def update_watchlist(watchlist_id):
@@ -115,29 +119,6 @@ def update_watchlist(watchlist_id):
             update_watchlist.name = data['name']
             db.session.commit()
             return update_watchlist.json(), 200
-        else:
-            return {'error': {
-                'message': 'Forbidden',
-                'statusCode': 403
-            }}, 403
-    else:
-        return {'error': {
-            'message': 'Can not find watchlist',
-            'statusCode': 404
-        }}, 404
-
-#delete watchlist
-@watchlist_routes.route('/<int:watchlist_id>', methods=['DELETE'])
-@login_required
-def delete_watchlist(watchlist_id):
-    current_user_info = current_user.json()
-    current_user_id = current_user_info['id']
-    delete_watchlist = WatchList.query.get(watchlist_id)
-    if delete_watchlist:
-        if delete_watchlist.user_id == current_user_id:
-            db.session.delete(delete_watchlist)
-            db.session.commit()
-            return {'message': 'Successfully delete'}
         else:
             return {'error': {
                 'message': 'Forbidden',
@@ -192,6 +173,14 @@ def add_stock(watchlist_id):
     if form.errors:
         return {'error': form.errors}
 
+@watchlist_routes.route('/current')
+@login_required
+def user_watchlists():
+    current_user_info = current_user.json()
+    current_user_id = current_user_info['id']
+    user_watchlists = WatchList.query.filter(WatchList.user_id == current_user_id ).all()
+    return {'watchlists': [watchlist.json() for watchlist in user_watchlists]}
+
 #remove stock to watchlist
 @watchlist_routes.route('/stocks/<int:stock_id>', methods=['DELETE'])
 @login_required
@@ -214,20 +203,49 @@ def delete_stock(stock_id):
     db.session.commit()
     return {'message': 'Successfully delete stock'}
 
-
-
-@watchlist_routes.route('/current')
+@watchlist_routes.route('/')
 @login_required
-def user_watchlists():
+def all_watchlists():
+    """
+    Query for all watchlists and returns them in a list of watchlist dictionaries
+    """
+    watchlists = WatchList.query.all()
+    return {'watchlists': [watchlist.json() for watchlist in watchlists]}
+
+
+#delete watchlist
+@watchlist_routes.route('/<int:watchlist_id>', methods=['DELETE'])
+@login_required
+def delete_watchlist(watchlist_id):
     current_user_info = current_user.json()
     current_user_id = current_user_info['id']
-    user_watchlists = WatchList.query.filter(WatchList.user_id == current_user_id ).all()
-    return {'watchlists': [watchlist.json() for watchlist in user_watchlists]}
+    delete_watchlist = WatchList.query.get(watchlist_id)
+    if delete_watchlist:
+        if delete_watchlist.user_id == current_user_id:
+            db.session.delete(delete_watchlist)
+            db.session.commit()
+            return {'message': 'Successfully delete'}
+        else:
+            return {'error': {
+                'message': 'Forbidden',
+                'statusCode': 403
+            }}, 403
+    else:
+        return {'error': {
+            'message': 'Can not find watchlist',
+            'statusCode': 404
+        }}, 404
 
+
+
+"""
+NEWS ROUTES BEGIN HERE /api/news
+
+"""
 
 @news_routes.route("/")
 def get_all_news():
-    key_choice = os.getenv("STOCK_API_KEYS")
+    key_choice = os.getenv("STOCK_API_KEY")
     url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&apikey={key_choice}&sort=LATEST'
     r = requests.get(url)
     data = r.json()
@@ -245,7 +263,7 @@ def get_all_news():
 @news_routes.route("/<string:ticker>")
 def get_news_by_ticker(ticker):
     # return a an enumarated list of keys
-    news_api_keys = os.getenv("STOCK_API_KEYS")
+    news_api_keys = os.getenv("STOCK_API_KEY")
 
     url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&apikey={news_api_keys}&tickers={ticker}&sort=LATEST'
     r = requests.get(url)
@@ -260,25 +278,20 @@ def get_news_by_ticker(ticker):
     else:
         return jsonify({"error": "No news found at the moment"}), 500
 
-
-@news_routes.route("/liked", methods=["GET"])
-@login_required
-def get_article_like():
-    liked = News.query.filter(News.like == '1').filter(
-        News.user_id == current_user.id).all()
-    return jsonify([news.to_dict() for news in liked]), 200
-
-
 @news_routes.route("/liked", methods=["POST"])
+@login_required
 def add_article_like():
     add_article_form = AddArticleForm()
     add_article_form['csrf_token'].data = request.cookies['csrf_token']
+
+    current_user_info = current_user.json()
+    current_user_id = current_user_info['id']
     # sending to the database
 
     if add_article_form.validate_on_submit():
         new_liked_article = News(
             like=True,
-            user_id=add_article_form.data['user_id'],
+            user_id=current_user_id,
             title=add_article_form.data['title'],
             source=add_article_form.data['source'],
             image=add_article_form.data['image'],
@@ -286,13 +299,20 @@ def add_article_like():
         )
         db.session.add(new_liked_article)
         db.session.commit()
-        return jsonify(new_liked_article.to_dict())
+        return jsonify(new_liked_article.json())
     else:
         return jsonify(add_article_form.errors), 406
 
-
+@news_routes.route("/liked", methods=["GET"])
 @login_required
+def get_article_like():
+    liked = News.query.filter(News.like == '1').filter(
+        News.user_id == current_user.id).all()
+    return jsonify([news.json() for news in liked]), 200
+
+
 @news_routes.route("/liked/<int:news_id>", methods=["DELETE"])
+@login_required
 def delete_article_like(news_id):
     # find the liked article where user id is the same as the user_id
     # delete
