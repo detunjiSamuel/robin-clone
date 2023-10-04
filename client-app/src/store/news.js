@@ -1,6 +1,6 @@
-const GET_SAVED_NEWS = "news/bookmarks/get";
-const ADD_SAVED_NEWS = "news/bookmarks/add";
-const DELETE_SAVED_NEWS = "news/bookmarks/delete";
+const GET_SAVED_NEWS = "news/user/get";
+const ADD_SAVED_NEWS = "news/user/add";
+const DELETE_SAVED_NEWS = "news/user/delete";
 
 const API_BASE_NEWS = "/api/news";
 
@@ -30,7 +30,7 @@ const storeDispatchs = {
 /** ACTIONS */
 
 export const getSavedNews = () => async (dispatch) => {
-  const response = await fetch(`${API_BASE_NEWS}/bookmark`);
+  const response = await fetch(`${API_BASE_NEWS}/liked`);
 
   if (response.ok) {
     const news = await response.json();
@@ -39,7 +39,7 @@ export const getSavedNews = () => async (dispatch) => {
 };
 
 export const addToSavedNews = (news) => async (dispatch) => {
-  const response = await fetch(`${API_BASE_NEWS}/bookmark`, {
+  const response = await fetch(`${API_BASE_NEWS}/liked`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -54,7 +54,7 @@ export const addToSavedNews = (news) => async (dispatch) => {
 };
 
 export const deleteSavedNews = (news) => async (dispatch) => {
-  const response = await fetch(`${API_BASE_NEWS}/bookmark/${news.id}`, {
+  const response = await fetch(`${API_BASE_NEWS}/liked/${news.id}`, {
     method: "DELETE",
   });
 

@@ -181,7 +181,7 @@ def user_watchlists():
     user_watchlists = WatchList.query.filter(WatchList.user_id == current_user_id ).all()
     return {'watchlists': [watchlist.json() for watchlist in user_watchlists]}
 
-#remove stock to watchlist
+#remove stock in watchlist
 @watchlist_routes.route('/stocks/<int:stock_id>', methods=['DELETE'])
 @login_required
 def delete_stock(stock_id):

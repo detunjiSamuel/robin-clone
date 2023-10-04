@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, Navigate } from "react-router-dom";
 
-import { login } from "../../store/user";
+import { login } from "../../store/auth";
 
 import leftImage from "../../images/login-image.jpeg";
 
@@ -30,18 +30,6 @@ const LoginForm = () => {
     }
   };
 
-  const fakeLogin = async (e) => {
-    e.preventDefault();
-
-    const testEmail = "test123@test.com";
-    const testPass = "testing1234";
-
-    const returnedError = await dispatch(login(testEmail, testPass));
-
-    if (returnedError) {
-      setErrors(returnedError);
-    }
-  };
 
   if (user) {
     return <Navigate to="/" replace={true} />;
