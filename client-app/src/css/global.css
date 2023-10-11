@@ -1,0 +1,41 @@
+
+button {
+ border: 1px solid black;
+ border-radius: 2.4rem;
+ padding: 0 2.8rem;
+ height: 4.4rem;
+ font-size: 1.4rem;
+ font-weight: 550;
+ min-width: 10.2rem
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+-moz-appearance: textfield;
+appearance: textfield;
+}
+
+
+body {
+ font-family: "Anek Tamil", sans-serif;
+ box-sizing: border-box;
+ font-size: 1.4rem;
+ position: relative;
+
+ --robin-green: #00C805;
+ --robin-darkest-green: #002615;
+ --robin-darker-green: #005f32;
+ --robin-lime-green: #c3f53c;
+ --robin-disclosure-green: #00c704;
+ --robin-form-lightgray: #b1b5b8;
+ --robin-sell-red: #FF6600;
+ --robin-border-lightgray: #E3E9ED;
+ --robin-hover-green: rgba(0,180,5,1);
+ --robin-hover-red: rgba(255,80,0,0.3);
+}

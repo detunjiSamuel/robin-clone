@@ -1,11 +1,12 @@
 
+import { BASE_URL } from "./config"
 
 const SET_PROFILE_IMAGE = "user/profileImage/add";
 const REMOVE_PROFILE_IMAGE = "user/profileImage/remove";
 const ADD_NEW_TRANSACTION = "user/networth/update";
 
 
-const API_BASE_USER = "/api/users";
+const API_BASE_USER = BASE_URL  + "/api/users";
 
 const storeDispatchs = {
 

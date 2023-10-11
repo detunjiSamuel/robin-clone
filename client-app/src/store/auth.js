@@ -1,7 +1,9 @@
+import { BASE_URL } from "./config"
+
 const SET_USER = "user/login";
 const DELETE_USER = "user/logout";
 
-const API_BASE_AUTH = "/api/auth";
+const API_BASE_AUTH = BASE_URL + "/api/auth";
 
 const storeDispatchs = {
   setUser: (user) => {

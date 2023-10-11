@@ -1,3 +1,4 @@
+import { BASE_URL } from "./config"
 const CREATE_WATCHLIST = "watchlist/create";
 const DELETE_WATCHLIST = "watchlist/delete";
 const EDIT_WATCHLIST = "watchlist/edit";
@@ -7,7 +8,7 @@ const GET_WATCHLIST = "watchlist/user/get";
 const ADD_TO_WATCHLIST = "watchlist/stock/add";
 const REMOVE_FROM_WATCHLIST = "watchlist/stock/remove";
 
-const API_BASE_WATCHLIST = "/api/watchlists";
+const API_BASE_WATCHLIST = BASE_URL + "/api/watchlists";
 
 const storeDispatchs = {
   getWatchlist: (watchlists) => {

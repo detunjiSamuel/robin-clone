@@ -1,8 +1,10 @@
+import { BASE_URL } from "./config"
+
 const GET_SAVED_NEWS = "news/user/get";
 const ADD_SAVED_NEWS = "news/user/add";
 const DELETE_SAVED_NEWS = "news/user/delete";
 
-const API_BASE_NEWS = "/api/news";
+const API_BASE_NEWS = BASE_URL +  "/api/news";
 
 const storeDispatchs = {
   getSavedNews: (news) => {
@@ -63,7 +65,7 @@ export const deleteSavedNews = (news) => async (dispatch) => {
   }
 };
 
-const savedNewsReducer = (state = {}, action) => {
+const newsReducer = (state = {}, action) => {
   switch (action.type) {
     case GET_SAVED_NEWS: {
       const newState = { ...state };
@@ -93,4 +95,4 @@ const savedNewsReducer = (state = {}, action) => {
   }
 };
 
-export default savedNewsReducer;
+export default newsReducer;
