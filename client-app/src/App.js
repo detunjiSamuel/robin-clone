@@ -1,10 +1,12 @@
 import logo from "./logo.svg";
 import "./App.css";
-import "./css/global.css"
+import "./css/global.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import LoginForm from "./components/auth/loginForm";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
-
+import { useDispatch } from "react-redux";
+import { authenticate } from "./store/auth";
+import React, { useEffect } from "react";
 
 function Base() {
   return (
@@ -28,10 +30,18 @@ function Base() {
 }
 
 function ProtectedBase() {
-  return <div className="App">THIS IS  Protected Page testing</div>;
+  return <div className="App">THIS IS Protected Page testing</div>;
 }
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    (async () => {
+      await dispatch(authenticate());
+    })();
+  }, [dispatch]);
+
   return (
     <BrowserRouter>
       <Routes>
