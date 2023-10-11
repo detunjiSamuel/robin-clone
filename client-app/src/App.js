@@ -5,8 +5,13 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import LoginForm from "./components/auth/loginForm";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { useDispatch } from "react-redux";
-import { authenticate } from "./store/auth";
+import { authenticate, logout } from "./store/auth";
 import React, { useEffect } from "react";
+
+import UserPage from "./components/UserPage";
+import LandingNavBar from "./components/landingpage/navBar";
+import LandingFooter from "./components/landingpage/footer";
+import InvestPage from "./components/landingpage/InvestPage";
 
 function Base() {
   return (
@@ -45,16 +50,35 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route exact path="/" element={<Base />} />
-        <Route exact path="/login" element={<LoginForm />} />
+        <Route path="/" element={<Base />} />
+        <Route path="/login" element={<LoginForm />} />
 
         <Route
-          exact
           path="/protected"
           element={
             <ProtectedRoute>
               <ProtectedBase />
             </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/users/:user_id"
+          element={
+            <ProtectedRoute>
+              <UserPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/invest"
+          element={
+            <React.Fragment>
+              <LandingNavBar />
+              <InvestPage />
+              <LandingFooter />
+            </React.Fragment>
           }
         />
       </Routes>

@@ -1,4 +1,4 @@
-import { BASE_URL } from "./config"
+import { BASE_URL } from "./config";
 
 const SET_USER = "user/login";
 const DELETE_USER = "user/logout";
@@ -31,10 +31,12 @@ export const authenticate = () => async (dispatch) => {
   if (response.ok) {
     const data = await response.json();
     if (data.errors) {
+      localStorage.removeItem("auth:user");
       return;
     }
-
     dispatch(storeDispatchs.setUser(data));
+
+    localStorage.setItem("auth:user", data);
   }
 };
 
@@ -102,9 +104,11 @@ export const logout = () => async (dispatch) => {
     },
   });
 
-  if (response.ok) dispatch(storeDispatchs.deleteUser());
+  if (response.ok) {
+    dispatch(storeDispatchs.deleteUser());
+    localStorage.removeItem("auth:user");
+  }
 };
-
 
 const authReducer = (state = { user: null }, action) => {
   switch (action.type) {
@@ -123,5 +127,4 @@ const authReducer = (state = { user: null }, action) => {
   }
 };
 
-
-export default authReducer
+export default authReducer;

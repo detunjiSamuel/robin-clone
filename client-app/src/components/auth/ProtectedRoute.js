@@ -3,9 +3,8 @@ import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 
 const ProtectedRoute = (props) => {
-  const user = useSelector((state) => state.auth.user);
-
-  console.log("user", user)
+  // const user = useSelector((state) => state.auth.user);
+  const user =  localStorage.getItem('auth:user')
 
   return (
     <React.Fragment>
