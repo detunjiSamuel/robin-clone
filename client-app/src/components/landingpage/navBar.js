@@ -37,7 +37,7 @@ function LandingNavBar() {
                             <li className="landing-page-navlink" id="landing-page-learn-button">Learn</li>
                         </NavLink>
                         <NavLink to="/cashcard">
-                            <li className="landing-page-navlink" id="landing-page-CashCard-button">RocketCard</li>
+                            <li className="landing-page-navlink" id="landing-page-CashCard-button">RobinCard</li>
                         </NavLink>
                         <a className="landing-page-navlink" href="https://github.com/detunjiSamuel/robin-clone" target="_blank" rel="noopener noreferrer">Repository</a>
                     </ul>

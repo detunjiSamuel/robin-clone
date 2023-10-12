@@ -15,7 +15,7 @@ function InvestPage() {
                         <p>Access stocks, ETFs, and more. Oh, and no commission fees. That’s right.
                             Zero. Nada. Zilch. Your first can even be bought by yourself!</p>
                         <button onClick={() => navigate("/register")}>Get Started</button>
-                        <p id="investing-page-disclaimer">Stocks not actually offered, Rockethood is not a real company.</p>
+                        <p id="investing-page-disclaimer">Stocks not actually offered, this is not a real company.</p>
                     </div>
                 </div>
             </div>

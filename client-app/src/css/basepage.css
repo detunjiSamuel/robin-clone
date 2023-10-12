@@ -1,0 +1,88 @@
+
+
+#home-page-learn-more {
+ background-color: #C3F53C;
+ color: rgb(0, 44, 21);
+ border: none;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ height: 5rem;
+ width: 23rem;
+}
+
+#button-container {
+ display: flex;
+ justify-content: space-between;
+ justify-content: center;
+ margin-top: 4.8rem;
+}
+
+
+#home-video-section {
+ background-color: var(--robin-darkest-green);
+ width: 100%;
+ min-height: 75vh;
+}
+
+#under-video-text {
+ color: #C3F53C;
+ font-weight: 500;
+ font-size: 7.7rem;
+ display: flex;
+ flex-direction: column;
+ align-items:center;
+ text-align: center;
+ height: fit-content;
+ line-height: 8rem;
+ margin-top: 8rem;
+
+}
+
+#top-line {
+ width: fit-content;
+ display: inline-block;
+
+}
+
+#bottom-line {
+ width: fit-content;
+ /* height: fit-content; */
+ display: inline-block;
+}
+
+#video-container {
+ display: flex;
+ justify-content: center;
+ object-fit: contain;
+ overflow-clip-margin: content-box;
+}
+
+#video-container .video{
+ max-height: 77.5vh;
+ width: 100%;
+
+}
+
+#under-video-container {
+ padding: 2.5rem 2.5rem 7.5rem;
+
+}
+
+#checkout-section-container {
+ background-color: var(--robin-darkest-green);
+ color: #C3F53C;
+}
+
+
+@media screen and (max-width: 768px) {
+ #video-container .video {
+     max-height: 62.5vh;
+ }
+}
+
+@media screen and (max-width: 425px) {
+ #video-container .video {
+     max-height: 44.5vh;
+ }
+}

@@ -5,7 +5,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import LoginForm from "./components/auth/loginForm";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { useDispatch } from "react-redux";
-import { authenticate, logout } from "./store/auth";
+import { authenticate } from "./store/auth";
 import React, { useEffect } from "react";
 
 import UserPage from "./components/UserPage";
@@ -13,27 +13,7 @@ import LandingNavBar from "./components/landingpage/navBar";
 import LandingFooter from "./components/landingpage/footer";
 import InvestPage from "./components/landingpage/InvestPage";
 import LearnPage from "./components/landingpage/learnPage";
-
-function Base() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+import Base from "./components/landingpage/Base";
 
 function ProtectedBase() {
   return <div className="App">THIS IS Protected Page testing</div>;
@@ -51,7 +31,16 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Base />} />
+        <Route
+          path="/"
+          element={
+            <React.Fragment>
+              <LandingNavBar />
+              <Base />
+              <LandingFooter />
+            </React.Fragment>
+          }
+        />
         <Route path="/login" element={<LoginForm />} />
 
         <Route
