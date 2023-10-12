@@ -12,6 +12,7 @@ import UserPage from "./components/UserPage";
 import LandingNavBar from "./components/landingpage/navBar";
 import LandingFooter from "./components/landingpage/footer";
 import InvestPage from "./components/landingpage/InvestPage";
+import LearnPage from "./components/landingpage/learnPage";
 
 function Base() {
   return (
@@ -77,6 +78,17 @@ function App() {
             <React.Fragment>
               <LandingNavBar />
               <InvestPage />
+              <LandingFooter />
+            </React.Fragment>
+          }
+        />
+
+        <Route
+          path="/learn"
+          element={
+            <React.Fragment>
+              <LandingNavBar />
+              <LearnPage />
               <LandingFooter />
             </React.Fragment>
           }
